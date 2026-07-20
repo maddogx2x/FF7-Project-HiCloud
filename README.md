@@ -56,7 +56,8 @@ The project changes two disc-resident resources:
   layout, and CLUT origin while remapping its texture indices to a 64-entry
   palette.
 
-Only BPS deltas are distributed. No complete game file is included.
+Only BPS deltas are distributed. They are Base64-wrapped for reliable source
+hosting and decoded by the patcher in memory. No complete game file is included.
 
 ## Why 2 MiB still fails
 
@@ -87,4 +88,3 @@ The 8 MiB/Palette64 build is a working release candidate, not a claim of full
 game certification. Keep an original image and report the disc, formation,
 party order, platform/core version, and whether the failure occurs during load,
 battle, or cleanup.
-

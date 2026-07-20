@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+*.bin
+*.cue
+*.iso
+*.img
+*.lzs
+*.x
+build/
+dist/
+
