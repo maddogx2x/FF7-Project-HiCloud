@@ -59,6 +59,12 @@ The project changes two disc-resident resources:
 Only BPS deltas are distributed. They are Base64-wrapped for reliable source
 hosting and decoded by the patcher in memory. No complete game file is included.
 
+## Known issues
+
+- **Cover Materia crash:** if another party member equipped with Cover intercepts
+  an attack intended for Cloud, the game can crash. Until this is resolved,
+  avoid configurations in which another character may Cover Cloud.
+
 ## Why 2 MiB still fails
 
 The normal player-body allocation has a `0xF000`-byte slot stride. HiCloud's
