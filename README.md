@@ -54,16 +54,13 @@ The project changes two disc-resident resources:
   archive and uses the tested positional player-layout patch;
 - `HICLOUD.LZS`: retains the model, UVs, texture dimensions, 8-bpp mode, TIM
   layout, and CLUT origin while remapping its texture indices to a 64-entry
-  palette.
+  palette. The belt-only colors use a neutral gray ramp capped at PS1 RGB5
+  level 17 (display RGB 139, the nearest representable value to RGB 140),
+  replacing the earlier overly bright near-white appearance without changing
+  Cloud's eye texels.
 
 Only BPS deltas are distributed. They are Base64-wrapped for reliable source
 hosting and decoded by the patcher in memory. No complete game file is included.
-
-## Known issues
-
-- **Cover Materia crash:** if another party member equipped with Cover intercepts
-  an attack intended for Cloud, the game can crash. Until this is resolved,
-  avoid configurations in which another character may Cover Cloud.
 
 ## Why 2 MiB still fails
 

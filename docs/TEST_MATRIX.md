@@ -19,15 +19,6 @@
 - companion/model substitutions
 - battle entry and completion in lighter formations
 
-## Known gameplay bug
-
-| Scenario | Result |
-|---|---|
-| Another character's Cover Materia activates for Cloud | Can crash the game |
-
-Workaround: avoid party configurations in which another character may Cover
-Cloud.
-
 ## Known unsupported configuration
 
 Standard 2 MiB RAM remains unsafe for heavy formations. A successful small
@@ -41,4 +32,3 @@ battle is not evidence that the memory layout is globally safe.
 - battle/formation and party order
 - whether entry, model load, action, victory, or cleanup failed
 - screenshot plus RAM/VRAM dump when available
-

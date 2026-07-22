@@ -35,3 +35,16 @@ Although 64 colors began as an extreme diagnostic, direct testing found Cloud's
 eyes and belt visually correct while the skybox strip disappeared. We therefore
 kept the safer 64-entry boundary rather than moving back toward the collision.
 
+## Belt color refinement
+
+The initial Palette64 conversion left the belt brighter and more cream-colored
+than intended. The current release remaps only texels in the connected belt
+atlas region to palette indices used exclusively by the belt. Those entries now
+form a neutral grayscale ramp whose brightest value is PS1 RGB5 level 17,
+displayed as RGB `139,139,139` (the nearest PS1-representable value to RGB 140).
+
+The ramp is scaled rather than clipped, preserving belt highlights and seams.
+The CLUT upload remains 64 entries; transparency and STP classes are retained;
+and Cloud's eye texels, geometry, UVs, skeleton, animations, and weapons are
+unchanged. `tools/hicloud_belt_grey.py` reproduces this refinement from the
+verified original Palette64 target.

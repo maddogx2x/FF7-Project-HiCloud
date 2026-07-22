@@ -23,11 +23,11 @@ from _hicloud_iso import (
 )
 
 
-RELEASE = "Project HiCloud 8 MiB/Palette64 v1.0.0-rc1"
+RELEASE = "Project HiCloud 8 MiB/Palette64 v1.0.0-rc2"
 BATTLE_PATCH = "HiCloud_8MB_BATTLE.X.bps.b64"
 HICLOUD_PATCH = "HiCloud_Palette64_HICLOUD.LZS.bps.b64"
 PATCHED_BATTLE_SHA256 = "00c85f473325ba3883169e386fb82ad9ccb02519c35662e70b82b11379e41757"
-PATCHED_HICLOUD_SHA256 = "9d073ca26d4312ddf1d7378dec48a476458805fa20b4a00b850df8d960ccf7bd"
+PATCHED_HICLOUD_SHA256 = "72b2121727159403eb4e36bc7e8ff670f1230a6c84a90cb5060b1efbb6967746"
 
 
 def fail(message: str) -> "NoReturn":
