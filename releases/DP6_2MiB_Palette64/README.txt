@@ -74,7 +74,13 @@ RECOMMENDED USAGE
 4. Drag the clean CUE onto Patch_FF7_Disc.bat.
 5. Load the generated:
 
+     Final Fantasy VII (Disc N)_HighRes_Cloud.cue
+
+   The patcher reads the verified game executable and substitutes the correct
+   disc number automatically:
      Final Fantasy VII (Disc 1)_HighRes_Cloud.cue
+     Final Fantasy VII (Disc 2)_HighRes_Cloud.cue
+     Final Fantasy VII (Disc 3)_HighRes_Cloud.cue
 
 Python 3 is required. The original BIN/CUE are not modified.
 
