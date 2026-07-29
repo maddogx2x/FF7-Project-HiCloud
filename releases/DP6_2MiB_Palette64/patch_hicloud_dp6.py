@@ -33,6 +33,11 @@ MAIN_RESTORE_FILE_OFFSET = (
 MAIN_RESTORE_SECTOR_OFFSET = MAIN_RESTORE_FILE_OFFSET // 2048
 MAIN_RESTORE_SIZE = TEMP_MODEL_CAPACITY
 MAIN_EXECUTABLE_NAMES = ("SCUS_941.63", "SCUS_941.64", "SCUS_941.65")
+DISC_NUMBER_BY_EXECUTABLE = {
+    "SCUS_941.63": 1,
+    "SCUS_941.64": 2,
+    "SCUS_941.65": 3,
+}
 EXPECTED_MAIN_RESTORE_WINDOW_SHA256 = (
     "c3b1d2b3a49b928a176210713ac8334e5a6b45eec2c774305dbc0e9084fa0a44"
 )
@@ -416,7 +421,8 @@ def patch_disc(cue_path: Path) -> tuple[Path, Path, str, int]:
     ):
         raise DiscPatchError("Palette64 patch produced an unexpected HICLOUD.LZS.")
 
-    output_stem = "Final Fantasy VII (Disc 1)_HighRes_Cloud"
+    disc_number = DISC_NUMBER_BY_EXECUTABLE[main_entry.path]
+    output_stem = f"Final Fantasy VII (Disc {disc_number})_HighRes_Cloud"
     output_bin = cue_path.with_name(f"{output_stem}.bin")
     output_cue = cue_path.with_name(f"{output_stem}.cue")
     if output_bin.exists() or output_cue.exists():
