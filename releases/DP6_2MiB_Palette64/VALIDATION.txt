@@ -1,0 +1,150 @@
+FFVII HICLOUD DYNAMIC PACKING DP6 + PALETTE64 — VALIDATION
+=========================================================
+
+Verified retail resources
+-------------------------
+BATTLE.X
+  Size:       130,322 bytes
+  SHA-256:    0ac8e4297dd83226e18ebeffc20d1c372fd8ca7838c1edb7ec48138858f08e88
+  Dec SHA-1:  c82690f814b18664c3b2d024f4edeea5743995d9
+
+HICLOUD.LZS
+  Size:       99,118 bytes
+  SHA-256:    3fa1293e7aa4bca5c6d5f5957e558a1e493a9cf70163d448a3dbc4e5c8fbe6f4
+
+MDEC/VLC restore window
+  RAM:        0x80052800-0x80062000
+  EXE offset: 0x00043000-0x00052800
+  Size:       0xF800 bytes / 31 sectors
+  SHA-256:    c3b1d2b3a49b928a176210713ac8334e5a6b45eec2c774305dbc0e9084fa0a44
+
+Palette64 HICLOUD.LZS
+  Size:       99,118 bytes
+  SHA-256:    72b2121727159403eb4e36bc7e8ff670f1230a6c84a90cb5060b1efbb6967746
+
+DP2 baseline retained
+---------------------
+PASS  Built from the verified clean NTSC-U retail BATTLE.X.
+PASS  Party layout is completed before the first enemy decompression.
+PASS  Retail func_800C5E94 still selects variants and physical slots.
+PASS  Every later fixed-0xF000 reconstruction uses the dynamic pointer table.
+PASS  Empty party slots retain the correct physical pointer-table index.
+PASS  Unknown archive IDs retain a conservative 0xF000 fallback.
+PASS  Retail state-3 publication paths remain restored.
+PASS  DP3/DP4 packet-bank base and overflow changes are absent.
+PASS  Audited renderer ranges are byte-identical to retail.
+
+DP6 temporary-storage validation
+--------------------------------
+PASS  Temporary storage is limited to 0x80052800-0x80062000.
+PASS  Split storage activates only for a full HiCloud party.
+PASS  Only an ordinary model ID 1-15 can be placed in the temporary window.
+PASS  Largest ordinary body is Red XIII at 0xEED8 bytes.
+PASS  Minimum temporary-window margin is 0x928 bytes.
+PASS  Restore-needed state is cleared at the start of every layout plan.
+PASS  BATRES runs before the restore read, preserving victory/results actors.
+PASS  Restore uses synchronous raw reader func_80033F40 with no callback.
+PASS  DP5's streaming decompression reader func_80033FC4 is absent.
+PASS  Retail code confirms func_80033F40 uses CDOP_3, while func_80033FC4
+      uses CDOP_11 and installs the streaming decompressor.
+PASS  Restore target and size are exactly 0x80052800 and 0xF800.
+PASS  Normal field return cannot resume before the restore completes.
+PASS  Injected planner/wrapper pass the R3000A load-delay scan.
+PASS  Complete injection fits inside retail's guarded NOP span.
+
+DP5 results-crash forensics
+---------------------------
+PASS  Normal and Zolom DP5 dumps both save EPC 0x80042C80.
+PASS  Both save Cause 0x0000041C (data-bus error).
+PASS  EPC is lhu v0,0(v1) in SDK GetRCnt.
+PASS  Both invalid effective addresses are 0x00FE091E.
+PASS  The timer-register base at 0x80062B94 changed from 0x1F801100 to
+      0x00FE08FE.
+PASS  Both dumps contain DP5's func_80033FC4 call in the restore wrapper.
+PASS  Corruption begins exactly at 0x80052800 and is byte-identical through
+      0x80063350 in both encounters.
+PASS  The corrupted interval extends 0x1350 bytes past the requested raw
+      restore window, proving decompressor expansion rather than actor layout.
+
+Memory evidence
+---------------
+PASS  Complete vanilla trace parsed:
+        362,887,887 instructions
+         98,240,133 memory accesses
+                  0 unparsed instruction lines
+                  0 malformed memory lines
+PASS  Combined CPU/DMA coverage contains no access flag in the full window.
+PASS  Vanilla and HiCloud comparison dumps contain the same original window.
+PASS  Eleven KOTR snapshots contain the same original window:
+        pre-battle field
+        battle loading
+        fully loaded
+        summon start
+        four mid-cast points
+        summon complete
+        results screen
+        full field return
+PASS  All 13 checked RAM captures match the executable-window SHA-256.
+
+Exhaustive layout validation
+----------------------------
+PASS  37 HiCloud party scenarios scanned across all 1,024 formations.
+PASS  37,888 total layouts fit without actor/battle-state overlap.
+PASS  Confirmed DP2 worst-case overflow remains 0x5D84.
+PASS  DP6 minimum actor-arena margin is 0x9030.
+PASS  HiCloud + Red XIII + Vincent3 versus Zolom:
+        HiCloud  = 0x80103200
+        Red XIII = 0x801199F4
+        Vincent3 = 0x80052800
+        Zolom    = 0x801288CC
+        Zolom end= 0x80143B34
+        arena margin = 0xD6CC
+        temporary-window margin = 0xA4C
+
+Disc patcher validation
+-----------------------
+PASS  Accepts a standard single-BIN MODE2/2352 CUE.
+PASS  Locates SCUS_941.63/.64/.65 through ISO9660.
+PASS  Verifies the PS-X EXE header and 0x80010000 load address.
+PASS  Verifies all 31 clean restore sectors before patching.
+PASS  Derives restore LBA as executable LBA + 0x86.
+PASS  Injected LBA is recovered from patched BATTLE.X during the test.
+PASS  Clean executable remains byte-identical on the patched disc.
+PASS  Original BIN/CUE remain byte-identical.
+PASS  BATTLE.X and HICLOUD.LZS read-back hashes match.
+PASS  Every changed Mode 2 Form 1 sector receives regenerated EDC/ECC.
+PASS  Synthetic full BIN/CUE patch/read-back regression passes.
+
+Reference deterministic BATTLE.X build
+--------------------------------------
+The shipped patcher derives the restore LBA from the selected clean disc, so
+the actual BATTLE.X SHA-256 can vary with that LBA. For test LBA 0x12345:
+
+  Size:       130,322 bytes
+  SHA-256:    b5079b8e5143e708ac7ff7c1931f18739ee259e04e7acae2ccf95ba25bb9db1a
+  Dec SHA-1:  4d554faf92e044637727f5fe99498a9e082c07e2
+
+Regression status
+-----------------
+PASS  23 project tests pass with the supplied forensic fixtures.
+PASS  DP5 and DP6 deterministic builds differ by exactly one byte at
+      0x800D24D0, changing jal 0x80033FC4 to jal 0x80033F40.
+PASS  Clean synthetic direct-disc construction and read-back pass.
+PASS  Tests and deterministic rebuild pass from a clean ZIP extraction.
+PASS  Package contains no fixed-LBA prepatched BATTLE.X.
+
+Runtime status
+--------------
+DP5 passed normal battles, Zolom, and Knights of the Round on hardware, then
+failed during results restoration because it selected the decompression reader.
+DP6 passed on a standard 2 MiB target with HiCloud + Red XIII + Vincent:
+  - regular battle, results, and field return
+  - Midgar Zolom
+  - Jenova-LIFE
+  - Northern Crater battles through the final Sephiroth encounters
+  - Limits, Knights of the Round, other summons, and varied magic
+  - final Cloud-versus-Sephiroth battle and direct FMV transition
+
+DP6 is the hardware-validated golden 2 MiB build.
+
+Build date: July 29, 2026

@@ -1,93 +1,126 @@
 # Project HiCloud
 
-Project HiCloud makes Final Fantasy VII's high-detail battle Cloud model usable
-throughout the NTSC-U PlayStation game while preserving the rest of each
-equipped weapon's behavior and the original battle system.
+Project HiCloud makes Final Fantasy VII's native high-detail Cloud battle model
+usable throughout the NTSC-U PlayStation game while preserving the retail
+battle renderer, all three party slots, weapon behavior, and standard **2 MiB**
+PlayStation RAM.
 
-The current release candidate is the first configuration we have tested that
-solves both known failure classes:
+## Golden 2 MiB release
 
-- an 8 MiB PlayStation RAM mode prevents large battle formations—most notably
-  Midgar Zolom—from colliding with the oversized player model;
-- HiCloud's 8-bpp palette is compacted from 198 used colors to 64 entries, so
-  its CLUT upload no longer overwrites populated battle-background palettes.
+DP6 + Palette64 is the first hardware-validated 2 MiB build. It solves both
+independent resource problems:
 
-In testing, Midgar Zolom loads and the battle completes, Cloud's eyes and belt
-render correctly, the skybox strip is gone, and several large late-game battles
-also load normally.
+- dynamic battle-model packing prevents HiCloud's oversized body from
+  overwriting another actor;
+- reversible split storage gives the heaviest formations enough battle RAM
+  without changing the retail renderer or requiring extended memory;
+- Palette64 compacts HiCloud's 8-bpp palette from 198 used colors to 64 entries,
+  preventing its CLUT upload from overwriting populated battle-background
+  palettes.
+
+The worst-case tested party—HiCloud, Red XIII, and Vincent—passed regular
+battles, Midgar Zolom, Jenova-LIFE, and the Northern Crater through the final
+Sephiroth encounters. Testing included Limits, Knights of the Round, other
+summons, varied magic, results/field return, and the final one-on-one battle
+that transitions directly into an FMV.
 
 ## Requirements
 
 - Final Fantasy VII NTSC-U, disc serial `SCUS-94163`, `SCUS-94164`, or
-  `SCUS-94165`, as a single-BIN MODE2/2352 image with its CUE file
+  `SCUS-94165`
+- a single-BIN MODE2/2352 image with its CUE file
 - Python 3.10 or newer
-- a platform with 8 MiB PSX RAM support, tested with SuperStation One and
-  DuckStation
-- 8 MiB RAM enabled before booting the patched image
+- standard 2 MiB PlayStation RAM
 
-Standard 2 MiB PlayStation hardware is **not currently supported**. This is an
-experimental extended-memory mod, not a retail-hardware-compatible release.
+DP6 does not require an 8 MiB emulator or FPGA mode.
 
-## Applying the release
+## Applying DP6
 
-1. Download this repository or a release archive.
-2. Keep the original NTSC-U `.bin` and `.cue` together.
-3. On Windows, drag the CUE onto `Patch_HiCloud_8MB_Palette64_Windows.bat`.
-4. Or run:
+1. Download or clone this repository.
+2. Open `releases/DP6_2MiB_Palette64`.
+3. Keep the original NTSC-U BIN and CUE together.
+4. On Windows, drag the clean CUE onto `Patch_FF7_Disc.bat`.
+5. Boot the generated `Final Fantasy VII (Disc 1)_HighRes_Cloud.cue`.
 
-   ```text
-   python Patch_HiCloud.py "Final Fantasy VII (Disc 1).cue"
-   ```
+The patcher:
 
-5. Enable 8 MiB PSX RAM and boot the newly generated
-   `*_HiCloud_8MB_Palette64.cue`.
+- identifies all three NTSC-U discs through ISO9660;
+- verifies clean retail `BATTLE.X`, `HICLOUD.LZS`, and the executable restore
+  window;
+- derives the disc-specific executable LBA instead of embedding an unsafe fixed
+  address;
+- copies the source image and never patches it in place;
+- rebuilds Mode 2 Form 1 EDC/ECC;
+- reads the completed image back and verifies every patched resource.
 
-The patcher validates the disc identity and source hashes, never edits the
-original image, rebuilds Mode 2 Form 1 EDC/ECC, and reads the result back for
-verification.
+Only patch logic and a size-preserving Palette64 BPS delta are distributed. No
+complete copyrighted game file or prepatched `BATTLE.X` is included.
 
-## What changed
+## How 2 MiB was solved
 
-The project changes two disc-resident resources:
+Retail battle loading reserves three fixed `0xF000`-byte player slots beginning
+at `0x80103200`. HiCloud reaches `0x167F4` bytes, so it can exceed a normal slot
+and collide with the next player. DP2 proved that model loading could instead
+use a dynamic pointer table and size-aware packing, but the largest
+party/formation combinations could still exceed the remaining battle arena by
+`0x5D84` bytes.
 
-- `BATTLE.X`: redirects ordinary Cloud battle loads to the native high-detail
-  archive and uses the tested positional player-layout patch;
-- `HICLOUD.LZS`: retains the model, UVs, texture dimensions, 8-bpp mode, TIM
-  layout, and CLUT origin while remapping its texture indices to a 64-entry
-  palette. The belt-only colors use a neutral gray ramp capped at PS1 RGB5
-  level 17 (display RGB 139, the nearest representable value to RGB 140),
-  replacing the earlier overly bright near-white appearance without changing
-  Cloud's eye texels.
+Broad CPU/DMA tracing and synchronized RAM snapshots—including a complete
+Knights of the Round sequence—identified
+`0x80052800–0x80062000` (`0xF800` bytes) as FFVII's static MDEC/VLC decode
+table. Battles do not use this table, but later FMVs do, so DP6 treats it as
+temporary borrowed storage rather than free RAM:
 
-Only BPS deltas are distributed. They are Base64-wrapped for reliable source
-hosting and decoded by the patcher in memory. No complete game file is included.
+1. HiCloud and one ordinary teammate remain in the dynamically packed actor
+   arena.
+2. The third sorted ordinary model is placed in the `0xF800` MDEC/VLC window.
+3. Enemies follow the two arena-resident party models.
+4. Results run normally while actor pointers are still valid.
+5. Before field control resumes, DP6 uses FFVII's synchronous raw-sector reader
+   to restore the exact original 31 executable sectors.
 
-## Why 2 MiB still fails
+Red XIII is the largest ordinary party body at `0xEED8`, leaving `0x928` bytes
+in temporary storage. All 37,888 scanned HiCloud party/formation layouts fit;
+the minimum remaining actor-arena margin is `0x9030`.
 
-The normal player-body allocation has a `0xF000`-byte slot stride. HiCloud's
-body reaches `0x167F4` bytes, overflowing a normal slot by `0x77F4` bytes. A
-following player can overwrite that tail. Repacking the player models fixes
-simple formations, but heavy enemy formations then push the enlarged player
-arena into other live battle allocations. Regions that looked unused in single
-RAM snapshots proved to be BSS, heap, staging, or later-loaded data.
+The restoration detail matters. DP5 accidentally called FFVII's streaming
+decompression reader, which expanded raw executable data past the borrowed
+window and corrupted timer globals during results. DP6 changes that call to the
+synchronous raw reader. The final battle's successful direct transition into
+an FMV provides hardware evidence that restoration completes before MDEC is
+needed again.
 
-More detail and concrete addresses are in
-[`docs/WHY_2MB_IS_UNSOLVED.md`](docs/WHY_2MB_IS_UNSOLVED.md). Contributions that
-produce a formation-safe 2 MiB allocator or a smaller compatible model layout
-are especially welcome.
+## Hardware validation
+
+| Scenario | Result |
+|---|---|
+| HiCloud + Red XIII + Vincent, regular battle | Passed |
+| Midgar Zolom | Passed |
+| Jenova-LIFE | Passed |
+| Northern Crater through final battles | Passed |
+| Limits, Knights of the Round, summons, and magic | Passed |
+| Results and return to field | Passed |
+| Final Cloud vs. Sephiroth → immediate FMV | Passed |
+
+## Legacy 8 MiB build
+
+The original 8 MiB/Palette64 patcher remains at the repository root for
+historical comparison and extended-memory testing. DP6 is the recommended build
+for standard hardware.
 
 ## Documentation
 
 - [Technical implementation](docs/TECHNICAL_IMPLEMENTATION.md)
-- [Why 2 MiB is unsolved](docs/WHY_2MB_IS_UNSOLVED.md)
+- [How the 2 MiB solution works](docs/WHY_2MB_IS_UNSOLVED.md)
 - [VRAM and Palette64](docs/VRAM_PALETTE64.md)
 - [Test matrix](docs/TEST_MATRIX.md)
 - [Research history](docs/RESEARCH_HISTORY.md)
+- [DP6 validation record](releases/DP6_2MiB_Palette64/VALIDATION.txt)
 - [Contributing](CONTRIBUTING.md)
 
 ## Project status
 
-The 8 MiB/Palette64 build is a working release candidate, not a claim of full
-game certification. Keep an original image and report the disc, formation,
-party order, platform/core version, and whether the failure occurs during load,
-battle, or cleanup.
+DP6 + Palette64 is the golden hardware-validated 2 MiB release. Additional
+testing and reports remain welcome; include the disc, formation, party order,
+platform/core version, and whether any issue occurs during load, battle,
+results, restoration, field return, or FMV playback.
