@@ -5,6 +5,15 @@ usable throughout the NTSC-U PlayStation game while preserving the retail
 battle renderer, all three party slots, weapon behavior, and standard **2 MiB**
 PlayStation RAM.
 
+## Download the 2 MiB release
+
+**[Download or browse DP6 + Palette64](https://github.com/maddogx2x/FF7-Project-HiCloud/tree/main/releases/DP6_2MiB_Palette64)**
+
+DP6 is the recommended build for standard PlayStation hardware, MiSTer, and
+emulators. It supports clean NTSC-U single-BIN MODE2/2352 images for all three
+discs. No copyrighted game data is included, and the patcher always leaves the
+original BIN/CUE untouched.
+
 ## Golden 2 MiB release
 
 DP6 + Palette64 is the first hardware-validated 2 MiB build. It solves both
@@ -34,16 +43,23 @@ that transitions directly into an FMV.
 
 DP6 does not require an 8 MiB emulator or FPGA mode.
 
-## Applying DP6
+## How to patch your BIN/CUE
 
 1. Download or clone this repository.
 2. Open `releases/DP6_2MiB_Palette64`.
-3. Keep the original NTSC-U BIN and CUE together.
-4. On Windows, drag the clean CUE onto `Patch_FF7_Disc.bat`.
-5. Boot the generated `Final Fantasy VII (Disc N)_HighRes_Cloud.cue`.
+3. Keep your clean NTSC-U BIN and CUE together in the same folder.
+4. On Windows, drag the clean `.cue` file onto `Patch_FF7_Disc.bat`.
+5. Wait for verification and patching to finish.
+6. Boot the newly generated `Final Fantasy VII (Disc N)_HighRes_Cloud.cue`.
 
 The patcher determines the disc from the verified executable serial and outputs
-the matching Disc 1, Disc 2, or Disc 3 BIN/CUE name automatically.
+the matching name automatically:
+
+- `Final Fantasy VII (Disc 1)_HighRes_Cloud.bin/.cue`
+- `Final Fantasy VII (Disc 2)_HighRes_Cloud.bin/.cue`
+- `Final Fantasy VII (Disc 3)_HighRes_Cloud.bin/.cue`
+
+Always launch the generated CUE rather than opening its BIN directly.
 
 The patcher:
 
@@ -58,6 +74,25 @@ The patcher:
 
 Only patch logic and a size-preserving Palette64 BPS delta are distributed. No
 complete copyrighted game file or prepatched `BATTLE.X` is included.
+
+## Community testing wanted
+
+DP6 has passed extensive targeted hardware and automated testing, but it has not
+yet been tested through every encounter and every full-game route. Broader
+playthrough testing across all three discs is welcome.
+
+When reporting a success or problem, please include:
+
+- disc number;
+- platform, emulator, or FPGA core and version;
+- party members and party order;
+- encounter or boss;
+- Limits, summons, magic, or unusual effects used;
+- whether the issue occurred during loading, battle, results, field return, or
+  FMV playback.
+
+Successful reports are valuable too—they help establish coverage beyond the
+current test matrix.
 
 ## How 2 MiB was solved
 
@@ -124,6 +159,4 @@ for standard hardware.
 ## Project status
 
 DP6 + Palette64 is the golden hardware-validated 2 MiB release. Additional
-testing and reports remain welcome; include the disc, formation, party order,
-platform/core version, and whether any issue occurs during load, battle,
-results, restoration, field return, or FMV playback.
+testing and reports remain welcome as full playthrough coverage expands.
