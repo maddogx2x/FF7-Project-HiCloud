@@ -74,7 +74,7 @@ RECOMMENDED USAGE
 4. Drag the clean CUE onto Patch_FF7_Disc.bat.
 5. Load the generated:
 
-     *_HiCloud_DP6_Palette64.cue
+     Final Fantasy VII (Disc 1)_HighRes_Cloud.cue
 
 Python 3 is required. The original BIN/CUE are not modified.
 
