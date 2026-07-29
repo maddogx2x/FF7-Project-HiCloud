@@ -169,6 +169,7 @@ def build_test_disc(
     battle: bytes,
     hicloud: bytes,
     main: bytes,
+    main_executable: str = "SCUS_941.65",
 ) -> tuple[Path, Path]:
     root_lba = 20
     battle_dir_lba = 21
@@ -202,7 +203,7 @@ def build_test_disc(
         directory_record(
             SYNTHETIC_MAIN_LBA,
             len(main),
-            b"SCUS_941.65;1",
+            f"{main_executable};1".encode("ascii"),
             False,
         ),
     )
@@ -853,11 +854,11 @@ class Dp6Tests(unittest.TestCase):
             )
             self.assertEqual(
                 output_bin.name,
-                "Final Fantasy VII (Disc 1)_HighRes_Cloud.bin",
+                "Final Fantasy VII (Disc 3)_HighRes_Cloud.bin",
             )
             self.assertEqual(
                 output_cue.name,
-                "Final Fantasy VII (Disc 1)_HighRes_Cloud.cue",
+                "Final Fantasy VII (Disc 3)_HighRes_Cloud.cue",
             )
             self.assertEqual(
                 restore_lba,
@@ -896,6 +897,43 @@ class Dp6Tests(unittest.TestCase):
             regenerated = bytearray(sector)
             dp6.regenerate_mode2_form1_checksums(regenerated)
             self.assertEqual(bytes(regenerated), sector)
+
+
+    def test_output_names_follow_verified_disc_identity(self) -> None:
+        clean_battle = SOURCE_BATTLE.read_bytes()
+        synthetic_main = build_synthetic_main()
+        synthetic_restore_hash = hashlib.sha256(
+            synthetic_main[
+                dp6.MAIN_RESTORE_FILE_OFFSET :
+                dp6.MAIN_RESTORE_FILE_OFFSET + dp6.MAIN_RESTORE_SIZE
+            ]
+        ).hexdigest()
+        for executable, disc_number in (
+            ("SCUS_941.63", 1),
+            ("SCUS_941.64", 2),
+            ("SCUS_941.65", 3),
+        ):
+            with self.subTest(executable=executable), tempfile.TemporaryDirectory() as temporary:
+                _, clean_cue = build_test_disc(
+                    Path(temporary),
+                    clean_battle,
+                    SOURCE_HICLOUD.read_bytes(),
+                    synthetic_main,
+                    executable,
+                )
+                with mock.patch.object(
+                    dp6,
+                    "EXPECTED_MAIN_RESTORE_WINDOW_SHA256",
+                    synthetic_restore_hash,
+                ):
+                    output_bin, output_cue, _, _ = dp6.patch_disc(clean_cue)
+                expected_stem = f"Final Fantasy VII (Disc {disc_number})_HighRes_Cloud"
+                self.assertEqual(output_bin.name, f"{expected_stem}.bin")
+                self.assertEqual(output_cue.name, f"{expected_stem}.cue")
+                self.assertIn(
+                    output_bin.name,
+                    output_cue.read_text(encoding="utf-8"),
+                )
 
 
 class PackagedArtifactTests(unittest.TestCase):
