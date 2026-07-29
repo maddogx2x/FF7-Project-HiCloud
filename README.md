@@ -40,7 +40,7 @@ DP6 does not require an 8 MiB emulator or FPGA mode.
 2. Open `releases/DP6_2MiB_Palette64`.
 3. Keep the original NTSC-U BIN and CUE together.
 4. On Windows, drag the clean CUE onto `Patch_FF7_Disc.bat`.
-5. Boot the generated `*_HiCloud_DP6_Palette64.cue`.
+5. Boot the generated `Final Fantasy VII (Disc 1)_HighRes_Cloud.cue`.
 
 The patcher:
 
