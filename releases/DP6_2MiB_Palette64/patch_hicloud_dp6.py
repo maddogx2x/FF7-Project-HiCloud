@@ -416,13 +416,13 @@ def patch_disc(cue_path: Path) -> tuple[Path, Path, str, int]:
     ):
         raise DiscPatchError("Palette64 patch produced an unexpected HICLOUD.LZS.")
 
-    output_bin = cue_path.with_name(f"{cue_path.stem}_HiCloud_DP6_Palette64.bin")
-    output_cue = cue_path.with_name(f"{cue_path.stem}_HiCloud_DP6_Palette64.cue")
+    output_stem = "Final Fantasy VII (Disc 1)_HighRes_Cloud"
+    output_bin = cue_path.with_name(f"{output_stem}.bin")
+    output_cue = cue_path.with_name(f"{output_stem}.cue")
     if output_bin.exists() or output_cue.exists():
         raise DiscPatchError(
             "Output already exists. Move or delete the previous "
-            "*_HiCloud_DP6_Palette64 "
-            "BIN/CUE before rerunning."
+            f"{output_stem}.bin/.cue before rerunning."
         )
 
     temporary_bin = output_bin.with_suffix(output_bin.suffix + ".tmp")
