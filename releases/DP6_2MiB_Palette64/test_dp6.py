@@ -852,6 +852,14 @@ class Dp6Tests(unittest.TestCase):
                 original_bin_hash,
             )
             self.assertEqual(
+                output_bin.name,
+                "Final Fantasy VII (Disc 1)_HighRes_Cloud.bin",
+            )
+            self.assertEqual(
+                output_cue.name,
+                "Final Fantasy VII (Disc 1)_HighRes_Cloud.cue",
+            )
+            self.assertEqual(
                 restore_lba,
                 SYNTHETIC_MAIN_LBA + dp6.MAIN_RESTORE_SECTOR_OFFSET,
             )
